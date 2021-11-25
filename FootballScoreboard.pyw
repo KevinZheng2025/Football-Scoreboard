@@ -1,11 +1,12 @@
-import os
 from tkinter import *
 from tkinter import colorchooser
 import time
 
-##Create TK window and set Name
-root = Tk()
-root.title("Football Scoreboard")
+##Create TK window, set Name
+root = Tk()                                 ##create TK window
+root.title("Football Scoreboard")           ##set window name
+root.attributes('-topmost',True)            ##set the window to always be on top
+root.resizable(width=False, height=False)   ##lock window resizeing so window crop will work right in OBS
 
 ##Declare Variable
 homePt = 0
@@ -33,6 +34,7 @@ def stop():
     global doTicks
     doTicks = False
 
+##sends time to canvas text
 def submitTime():
     root.update()
     canvas.itemconfig(timeText, text=(minute.get() + ':' + second.get()))
@@ -64,17 +66,19 @@ def start():
             # = temp%60)
             hours, mins = divmod(mins, 60)
 
+
         # using format () method to store the value up to
         # two decimal places
 
         minute.set("{0:2d}".format(mins))
         second.set('{:0>2}'.format(secs))
+        canvas.itemconfig(timeText, text=(minute.get() + ':' + second.get()))
 
         # updating the GUI window after decrementing the
         # temp value every time
         root.update()
 
-        canvas.itemconfig(timeText, text=(minute.get() + ':' + second.get()))
+
         time.sleep(1)
 
         # when temp value = 0; then a messagebox pop's up
@@ -85,35 +89,43 @@ def start():
         # by one
         temp -= 1
 
+##open up colorpicker and sends output from that to array
+##  and uses array to set canvas BG color
 def hmColor():
   global homeColor
   homeColor['rgb'], homeColor['hex'] = colorchooser.askcolor()
   print(homeColor)
   canvas.itemconfig(homeCanvas, outline=homeColor['hex'], fill=homeColor['hex'])
 
+##just uses config to update home name using input from entry
 def submitHomeName():
     canvas.itemconfig(homeNameText, text=home_name.get())
 
+##takes in a parameter and adds that to homePt varable and updates it with config
 def addHomePoint(point):
   global homePt
   homePt = homePt + point
   canvas.itemconfig(homeScoreText, text=homePt)
 
-
+##Same as home
 def awColor():
   global awayColor
   awayColor['rgb'], awayColor['hex'] = colorchooser.askcolor()
   canvas.itemconfig(awayCanvas, outline=awayColor['hex'], fill=awayColor['hex'])
 
+##Same as home
 def submitAwayName():
     canvas.itemconfig(awayNameText, text=away_name.get())
 
+##Same as home
 def addAwayPoint(point):
   global awayPt
   awayPt = awayPt + point
   print(awayPt)
   canvas.itemconfig(awayScoreText, text=awayPt)
 
+##takes in a parameter from button and uses that number to decide what to set the Period
+##  canvas text and configs it
 def period(userPeriod):
     if userPeriod == 1:
         canvas.itemconfig(periodText, text="1st")
@@ -130,6 +142,7 @@ def period(userPeriod):
     elif userPeriod == 7:
         canvas.itemconfig(periodText, text="Half")
 
+##takes in parameter from button and uses that number to show what Down it is
 def down(userDown):
     global downNum
     if userDown == 1:
@@ -145,6 +158,9 @@ def down(userDown):
         canvas.itemconfig(downText, text="4th Down")
         downNum = 4
 
+## uses the varaiable downNum from function down and using that will set
+##  which down it is and also takes the number from entry and concatnate
+##  it so that it shows down and distance
 def submitDownDist():
     downtext = ""
     if downNum == 1:
@@ -158,36 +174,35 @@ def submitDownDist():
     userDistance = downtext, '&', distance_num.get()
     canvas.itemconfig(downText, text=userDistance)
 
+##if there is a number in the distance_num entry it will take that number and
+##  add 1 to it and then delete the number in the entry and insert the new one
 def addDownDist():
     userDownDist = int(distance_num.get())
     tempNum = userDownDist + 1
     distance_num.delete(0, END)
     distance_num.insert(0, tempNum)
 
+##if there is a number in the distance_num entry it will take that number and
+##  subtract 1 to it and then delete the number in the entry and insert the new one
 def subtDownDist():
     userDownDist = int(distance_num.get())
     tempNum = userDownDist - 1
     distance_num.delete(0, END)
     distance_num.insert(0, tempNum)
 
+##just updates the downText canvas so it says 1st & 10
 def resetDownDist():
     canvas.itemconfig(downText, text = "1st & 10")
 
+##updates the Canvas text with 1st & 10 and inserts 'GL' into the distance_num entry
 def GlDownDist():
     distance_num.delete(0, END)
     distance_num.insert(0, "GL")
-    downtext = ""
-    if downNum == 1:
-        downtext = "1st"
-    elif downNum == 2:
-        downtext = "2nd"
-    elif downNum == 3:
-        downtext = "3rd"
-    elif downNum == 4:
-        downtext = "4th"
+    downtext = "1st"
     userDistance = downtext, '&', distance_num.get()
     canvas.itemconfig(downText, text=userDistance)
 
+## update the downText so it says nothing thus 'hiding' it
 def HideDownDist():
     canvas.itemconfig(downText, text='')
 
