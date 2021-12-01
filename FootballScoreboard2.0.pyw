@@ -4,12 +4,13 @@ import time
 
 ##Create TK window, set Name
 root = Tk()                                 ##create TK window
-root.title("Football Scoreboard")           ##set window name
+root.title("Football Scoreboard Control")           ##set window name
 root.attributes('-topmost',True)            ##set the window to always be on top
 root.geometry('950x320')
 root.configure(background="#404040")
 
 score = Tk()
+score.title("Football Scoreboard")
 score.configure(background="#00b140")
 score.resizable(width=False, height=False)  ##lock window resizeing so window crop will work right in OBS
 
