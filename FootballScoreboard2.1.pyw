@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import colorchooser
 import time
 
+##Version 2.1
+##Creator Kevin Zheng
+
 ##Create TK window, set Name
 root = Tk()                                 ##create TK window
 root.title("Football Scoreboard Control")           ##set window name
@@ -35,6 +38,8 @@ hmTOi=4
 hmTOj=12
 awTOi=4
 awTOj=12
+awayColor['hex']="#cecece"
+homeColor['hex']="#cecece"
 
 # setting the default value as 0
 minute.set("00")
@@ -107,6 +112,7 @@ def hmColor():
   homeColor['rgb'], homeColor['hex'] = colorchooser.askcolor()
   print(homeColor)
   canvas.itemconfig(homeCanvas, outline=homeColor['hex'], fill=homeColor['hex'])
+  canvas.itemconfig(homePossession, outline=homeColor['hex'], fill=homeColor['hex'])
 
 ##just uses config to update home name using input from entry
 def submitHomeName():
@@ -152,6 +158,7 @@ def awColor():
   global awayColor
   awayColor['rgb'], awayColor['hex'] = colorchooser.askcolor()
   canvas.itemconfig(awayCanvas, outline=awayColor['hex'], fill=awayColor['hex'])
+  canvas.itemconfig(awayPossession, outline=awayColor['hex'], fill=awayColor['hex'])
 
 ##Same as home
 def submitAwayName():
@@ -287,15 +294,33 @@ def Quit():
     root.destroy()
     score.destroy()
 
-canvas = Canvas(score, height=40, width=1280,bg="#00ff00",highlightthickness=0)
+def possession(userNum):
+    global awayColor
+    if userNum==0:
+        canvas.itemconfig(possessionLine,outline="black",fill="black")
+        canvas.coords(awayPossession,0,0,0,0,0,0)
+        canvas.coords(homePossession,0,0,0,0,0,0)
+        
+    elif userNum==1:
+        ##homePossession = canvas.create_polygon(380,43,410,43,395,35, outline=homeColor['hex'], fill=homeColor['hex'])
+        canvas.coords(awayPossession,0,0,0,0,0,0)
+        canvas.coords(homePossession,380,43,410,43,395,35)
+        canvas.itemconfig(possessionLine, outline=homeColor['hex'], fill=homeColor['hex'])
+    elif userNum==2:
+        ##awayPossession = canvas.create_polygon(740,43,770,43,755,35, outline=awayColor['hex'], fill=awayColor['hex'])
+        canvas.coords(homePossession,0,0,0,0,0,0)
+        canvas.coords(awayPossession,740,43,770,43,755,35)
+        canvas.itemconfig(possessionLine, outline=awayColor['hex'], fill=awayColor['hex'])
+
+canvas = Canvas(score, height=43, width=1280,bg="#00ff00",highlightthickness=0)
 canvas2 = Canvas(root, height=1, width=1000)
 homeCanvas = canvas.create_rectangle(60, 0, 420, 40, outline="#cecece", fill="#cecece")
-homeScoreBGCanvas = canvas.create_rectangle(370, 2, 420, 38, outline="#141414", fill="#141414")
-homeScoreText = canvas.create_text(395,20, text=homePt, font=('Arial Black', 23), fill="white")
+homeScoreBGCanvas = canvas.create_rectangle(368, 2, 420, 40, outline="#141414", fill="#141414")
+homeScoreText = canvas.create_text(394,20, text=homePt, font=('Arial Black', 23), fill="white")
 homeNameText = canvas.create_text(65, 20, text=home_name, font=('Arial Black', 25),anchor="w")
 awayCanvas = canvas.create_rectangle(420, 0, 780, 40, outline="#cecece", fill="#cecece")
-awayScoreBGCanvas = canvas.create_rectangle(730, 2, 780, 38, outline="#141414", fill="#141414")
-awayScoreText = canvas.create_text(755,20, text=awayPt, font=('Arial Black', 23), fill="white")
+awayScoreBGCanvas = canvas.create_rectangle(728, 2, 780, 40, outline="#141414", fill="#141414")
+awayScoreText = canvas.create_text(754,20, text=awayPt, font=('Arial Black', 23), fill="white")
 awayNameText = canvas.create_text(425, 20, text=away_name, font=('Arial Black', 25),anchor="w")
 periodBGCanvas = canvas.create_rectangle(780, 0, 860, 40, outline="#1d1d1d", fill="#1d1d1d")
 periodText = canvas.create_text(820,20, text="1st", font=('Ariel', 17,'bold'), fill="gold")
@@ -309,6 +334,9 @@ canvas.create_oval(352,28,360,36, fill='white')
 canvas.create_oval(712,4,720,12, fill='white')
 canvas.create_oval(712,16,720,24, fill='white')
 canvas.create_oval(712,28,720,36, fill='white')
+possessionLine = canvas.create_rectangle(60,40,1220,43, outline="black", fill="black")
+homePossession = canvas.create_polygon(0,0,0,0,0,0, outline=homeColor['hex'], fill=homeColor['hex'])
+awayPossession = canvas.create_polygon(0,0,0,0,0,0, outline=awayColor['hex'], fill=awayColor['hex'])
 canvas.pack()
 
 homeFrame= Frame(root, bg="#949494", width=300, height=160, borderwidth=0,highlightthickness=0)
@@ -490,6 +518,16 @@ HideDist_btn.place(x=195,y=120)
 
 Quit_btn = Button(bottomFrame, text = "Quit", command=Quit)
 Quit_btn.place(x=870,y=70)
+
+
+PossessionLabel= Label(bottomFrame, bg="#696969", fg="white", text="Possession",font=('Ariel', 15))
+PossessionLabel.place(x=680,y=0)
+homePossession_btn=Button(bottomFrame, height=2, width=8,text = "Home", command = lambda: possession(1))
+homePossession_btn.place(x=620,y=30)
+noPossession_btn= Button(bottomFrame, height=2, width=8,text = "None", command = lambda: possession(0))
+noPossession_btn.place(x=700,y=30)
+awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command = lambda: possession(2))
+awayPossession_btn.place(x=780,y=30)
 
 root.mainloop()
 score.mainloop()
