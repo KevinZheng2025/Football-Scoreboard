@@ -1,15 +1,17 @@
 from tkinter import *
 from tkinter import colorchooser
+from tkinter import ttk
+from tkinter import filedialog
 import time
 
-##Version 2.1
+##Version 2.2
 ##Creator Kevin Zheng
 
 ##Create TK window, set Name
 root = Tk()                                 ##create TK window
 root.title("Football Scoreboard Control")           ##set window name
 root.attributes('-topmost',True)            ##set the window to always be on top
-root.geometry('950x320')
+##root.geometry('950x320')
 root.configure(background="#404040")
 
 score = Tk()
@@ -40,6 +42,9 @@ awTOi=4
 awTOj=12
 awayColor['hex']="#cecece"
 homeColor['hex']="#cecece"
+holderTime = 0
+hmImage= PhotoImage(file="")
+awImage= PhotoImage(file="")
 
 # setting the default value as 0
 minute.set("00")
@@ -66,22 +71,13 @@ def start():
 
     global doTicks
     doTicks = True
-
+    global holderTime
 
     while (temp > -1) and doTicks:
         ##secLabel.config(text=second.get())
         ##minLabel.config(text=minute.get())
         # divmod(firstvalue = temp//60, secondvalue = temp%60)
         mins, secs = divmod(temp, 60)
-
-        # Converting the input entered in mins or secs to hours,
-        # mins ,secs(input = 110 min --> 120*60 = 6600 => 1hr :
-        # 50min: 0sec)
-        if mins > 60:
-            # divmod(firstvalue = temp//60, secondvalue
-            # = temp%60)
-            hours, mins = divmod(mins, 60)
-
 
         # using format () method to store the value up to
         # two decimal places
@@ -95,22 +91,26 @@ def start():
         root.update()
 
 
-        time.sleep(1)
+        time.sleep(.1)
 
         # when temp value = 0; then a messagebox pop's up
         # with a message:"Time's up"
 
-
         # after every one sec the value of temp will be decremented
         # by one
-        temp -= 1
+        if holderTime == 10:
+            temp -= 1
+            holderTime = 0
+        
+        holderTime += 1
+        
+        
 
 ##open up colorpicker and sends output from that to array
 ##  and uses array to set canvas BG color
 def hmColor():
   global homeColor
   homeColor['rgb'], homeColor['hex'] = colorchooser.askcolor()
-  print(homeColor)
   canvas.itemconfig(homeCanvas, outline=homeColor['hex'], fill=homeColor['hex'])
   canvas.itemconfig(homePossession, outline=homeColor['hex'], fill=homeColor['hex'])
 
@@ -128,6 +128,15 @@ def addHomePoint(point):
       canvas.itemconfig(homeScoreText, font=('Arial Black', 17))
   canvas.itemconfig(homeScoreText, text=homePt)
   HomePointLabel.configure(text=homePt)
+
+def homeImage():
+    global hmImage
+    root.filename = filedialog.askopenfilename(initialdir = "/Pictures",title = "Select a File",filetypes = (("png files", "*.png*"),("all files","*.*")))
+    hmImage= PhotoImage(master=canvas, file=root.filename)
+    oldHeight = hmImage.height()
+    scale_h = (int)(oldHeight/40)
+    hmImage= hmImage.subsample(scale_h)
+    canvas.itemconfig(hmLogo, image=hmImage)
 
 def addhomeTO():
     global homeTO
@@ -174,6 +183,15 @@ def addAwayPoint(point):
       canvas.itemconfig(awayScoreText, font=('Arial Black', 17))
   canvas.itemconfig(awayScoreText, text=awayPt)
   AwayScoreLabel.configure(text=awayPt)
+
+def awayImage():
+    global awImage
+    root.filename = filedialog.askopenfilename(initialdir = "/Pictures",title = "Select a File",filetypes = (("png files", "*.png*"),("all files","*.*")))
+    awImage= PhotoImage(master=canvas, file=root.filename)
+    oldHeight = awImage.height()
+    scale_h = (int)(oldHeight/40)
+    awImage= awImage.subsample(scale_h)
+    canvas.itemconfig(awLogo, image=awImage)
 
 def addawayTO():
     global awayTO
@@ -312,13 +330,18 @@ def possession(userNum):
         canvas.coords(awayPossession,740,43,770,43,755,35)
         canvas.itemconfig(possessionLine, outline=awayColor['hex'], fill=awayColor['hex'])
 
+notebook = ttk.Notebook(root)
+notebook.pack(expand=True)
+
 canvas = Canvas(score, height=43, width=1280,bg="#00ff00",highlightthickness=0)
 canvas2 = Canvas(root, height=1, width=1000)
 homeCanvas = canvas.create_rectangle(60, 0, 420, 40, outline="#cecece", fill="#cecece")
+hmLogo=canvas.create_image(330,20,image="")
 homeScoreBGCanvas = canvas.create_rectangle(368, 2, 420, 40, outline="#141414", fill="#141414")
 homeScoreText = canvas.create_text(394,20, text=homePt, font=('Arial Black', 23), fill="white")
 homeNameText = canvas.create_text(65, 20, text=home_name, font=('Arial Black', 25),anchor="w")
 awayCanvas = canvas.create_rectangle(420, 0, 780, 40, outline="#cecece", fill="#cecece")
+awLogo=canvas.create_image(690,20,image="")
 awayScoreBGCanvas = canvas.create_rectangle(728, 2, 780, 40, outline="#141414", fill="#141414")
 awayScoreText = canvas.create_text(754,20, text=awayPt, font=('Arial Black', 23), fill="white")
 awayNameText = canvas.create_text(425, 20, text=away_name, font=('Arial Black', 25),anchor="w")
@@ -339,16 +362,19 @@ homePossession = canvas.create_polygon(0,0,0,0,0,0, outline=homeColor['hex'], fi
 awayPossession = canvas.create_polygon(0,0,0,0,0,0, outline=awayColor['hex'], fill=awayColor['hex'])
 canvas.pack()
 
-homeFrame= Frame(root, bg="#949494", width=300, height=160, borderwidth=0,highlightthickness=0)
+controllNotebook = Frame(root, bg="#404040", width=950, height=320)
+controllNotebook.pack(fill='both', expand=True)
+
+homeFrame= Frame(controllNotebook, bg="#949494", width=300, height=160, borderwidth=0,highlightthickness=0)
 homeFrame.place(x=20,y=20)
 
-awayFrame= Frame(root, bg="#949494", width=300, height=160, borderwidth=0,highlightthickness=0)
+awayFrame= Frame(controllNotebook, bg="#949494", width=300, height=160, borderwidth=0,highlightthickness=0)
 awayFrame.place(x=630,y=20)
 
-downFrame= Frame(root, bg="#696969", width=270, height=160, borderwidth=0,highlightthickness=0)
+downFrame= Frame(controllNotebook, bg="#696969", width=270, height=160, borderwidth=0,highlightthickness=0)
 downFrame.place(x=340,y=20)
 
-bottomFrame= Frame(root, bg="#696969", width=910, height=100, borderwidth=0,highlightthickness=0)
+bottomFrame= Frame(controllNotebook, bg="#696969", width=910, height=100, borderwidth=0,highlightthickness=0)
 bottomFrame.place(x=20,y=200)
 
 home_name = Entry(homeFrame, width=12, font=("Arial", 12))
@@ -384,12 +410,17 @@ start_btn.place(x=405,y=65)
 stop_btn = Button(bottomFrame, text='Stop', bd='5',command=stop)
 stop_btn.place(x=455,y=65)
 
-hmColorPicker = Button(homeFrame, text = "Color",bd='5', command=hmColor)
+hmColorPicker = Button(homeFrame, text = "Color", command=hmColor)
 hmColorPicker.place(x=200,y=2)
 
-awColorPicker = Button(awayFrame, text = "Color",bd='5', command=awColor)
+hmLogoPicker = Button(homeFrame, text = "Logo", command = homeImage)
+hmLogoPicker.place(x=250,y=2)
+
+awColorPicker = Button(awayFrame, text = "Color", command=awColor)
 awColorPicker.place(x=200,y=2)
 
+awLogoPicker = Button(awayFrame, text = "Logo", command = awayImage)
+awLogoPicker.place(x=250,y=2)
 
 ##Home Point Button
 homeScoreLabel = Label(homeFrame, bg="#949494", fg="white", text="Score",font=('Ariel', 12))
@@ -528,6 +559,8 @@ noPossession_btn= Button(bottomFrame, height=2, width=8,text = "None", command =
 noPossession_btn.place(x=700,y=30)
 awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command = lambda: possession(2))
 awayPossession_btn.place(x=780,y=30)
+
+notebook.add(controllNotebook, text="Control")
 
 root.mainloop()
 score.mainloop()
