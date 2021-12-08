@@ -1,7 +1,7 @@
 # Football-Scoreboard
 Scoreboard that is built on python3.9 and has a live display so you can bring it into your live streaming software like OBS.
 
-Set up program from live streaming in OBS
+Set up program for live streaming in OBS
 
 Step 1: Download the FootballScoreboard.pyw file
 
@@ -9,7 +9,7 @@ Step 2: If you're on Windows install python either from https://www.python.org/d
 
 Step 3: Run the FootballScoreboard.pyw file
 
-Step 4: Open OBS and in the scene you want to add the scoreboard in click the "+" icon under the Sources tab NOT THE SCENE TAB and select window capture
+Step 4: Open OBS and in the scene you want to add the scoreboard in click the "+" icon under the Sources tab and select window capture
 
 Step 5: A properties window should pop up and in the window option select the Scoreboard Program also make sure to uncheck the Capture Curser option so when your mouse hovers over           the scoreboard it does not show up on the broadcast. After that is done click the OK button
 
