@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter import filedialog
 import time
 
-##Version 2.2
+##Version 2.3
 ##Creator Kevin Zheng
 
 ##Create TK window, set Name
@@ -45,6 +45,10 @@ homeColor['hex']="#cecece"
 holderTime = 0
 hmImage= PhotoImage(file="")
 awImage= PhotoImage(file="")
+isMini = False
+font17 = 17
+font23 = 23
+font25 = 25
 
 # setting the default value as 0
 minute.set("00")
@@ -143,11 +147,12 @@ def addhomeTO():
     if homeTO<3:
         homeTO += 1
         HomeTOLabel.configure(text=homeTO)
-        global hmTOi
-        global hmTOj
-        hmTOi -= 12
-        hmTOj -= 12
-        canvas.create_oval(352,hmTOi,360,hmTOj, fill='white')
+        if homeTO == 3:
+            canvas.itemconfig(hmTO1, fill='white')
+        elif homeTO == 2:
+            canvas.itemconfig(hmTO2, fill='white')
+        elif homeTO == 1:
+            canvas.itemconfig(hmTO3, fill='white')
 
 
 def takehomeTO():
@@ -155,12 +160,12 @@ def takehomeTO():
     if homeTO >0:
         homeTO -= 1
         HomeTOLabel.configure(text=homeTO)
-        global hmTOi
-        global hmTOj
-        canvas.create_oval(352,hmTOi,360,hmTOj, fill='black')
-        hmTOi += 12
-        hmTOj += 12
-
+        if homeTO == 2:
+            canvas.itemconfig(hmTO1, fill='black')
+        elif homeTO == 1:
+            canvas.itemconfig(hmTO2, fill='black')
+        elif homeTO == 0:
+            canvas.itemconfig(hmTO3, fill='black')
 
 ##Same as home
 def awColor():
@@ -197,12 +202,18 @@ def addawayTO():
     global awayTO
     if awayTO<3:
         awayTO += 1
-        AwayTOLabel.configure(text=homeTO)
-        global awTOi
-        global awTOj
-        awTOi -= 12
-        awTOj -= 12
-        canvas.create_oval(712,awTOi,720,awTOj, fill='white')
+        AwayTOLabel.configure(text=awayTO)
+        if awayTO == 3:
+            canvas.itemconfig(awTO1, fill='white')
+        elif awayTO == 2:
+            canvas.itemconfig(awTO2, fill='white')
+        elif awayTO == 1:
+            canvas.itemconfig(awTO3, fill='white')
+        ##global awTOi
+        ##global awTOj
+        ##awTOi -= 12
+        ##awTOj -= 12
+        ##canvas.create_oval(712,awTOi,720,awTOj, fill='white')
 
 
 def takeawayTO():
@@ -210,11 +221,12 @@ def takeawayTO():
     if awayTO >0:
         awayTO -= 1
         AwayTOLabel.configure(text=awayTO)
-        global awTOi
-        global awTOj
-        canvas.create_oval(712,awTOi,720,awTOj, fill='black')
-        awTOi += 12
-        awTOj += 12
+        if awayTO == 2:
+            canvas.itemconfig(awTO1, fill='black')
+        elif awayTO == 1:
+            canvas.itemconfig(awTO2, fill='black')
+        elif awayTO == 0:
+            canvas.itemconfig(awTO3, fill='black')
 
 ##takes in a parameter from button and uses that number to decide what to set the Period
 ##  canvas text and configs it
@@ -330,36 +342,129 @@ def possession(userNum):
         canvas.coords(awayPossession,740,43,770,43,755,35)
         canvas.itemconfig(possessionLine, outline=awayColor['hex'], fill=awayColor['hex'])
 
+def mini():
+    global isMini
+    global font17
+    global font23
+    global font25
+    if isMini == False:
+        for i in range (0,100,1):
+            time.sleep(.01)
+            canvas.coords(timeBGCanvas, 1060+(.40*i), 0+(.2*i),1220,40)
+            canvas.move(timeText,.2, .1)
+            if i % 12==0:
+                font23 -= 1
+                canvas.itemconfig(timeText,font=('Ariel Black',str(font23),'bold'))
+            if i % 14==0:
+                font25 -= 1
+                canvas.itemconfig(downText,font=('Ariel',str(font23), 'bold'))
+            if i % 20==0:
+                font17 -= 1
+                canvas.itemconfig(periodText,font=('Ariel', str(font17),'bold'))
+            canvas.coords(downBGCanvas, 860+i*2,0,1060+(1.62*i),40-(.2*i))
+            canvas.coords(periodBGCanvas,780+i*2.81, 0+(.2*i), 860+i*2.5,40)
+            canvas.move(downText,1.8,-.1)
+            canvas.move(periodText,2.6,.1)
+            canvas.coords(blankCanvas,780+i*2.81,0,1220,40)
+            canvas.move(awayCanvas,5.2,0)
+            canvas.move(awayNameText,5.83,0)
+            canvas.move(awLogo,2.8,0)
+            canvas.move(awTO1,2.8,0)
+            canvas.move(awTO2,2.8,0)
+            canvas.move(awTO3,2.8,0)
+            canvas.move(awayScoreBGCanvas,2.8,0)
+            canvas.move(awayScoreText,2.8,0)
+            canvas.move(homeCanvas,7.6,0)
+            canvas.move(homeNameText,8.23,0)
+            canvas.move(hmLogo,5.2,0)
+            canvas.move(hmTO1,5.2,0)
+            canvas.move(hmTO2,5.2,0)
+            canvas.move(hmTO3,5.2,0)
+            canvas.move(homeScoreBGCanvas,5.2,0)
+            canvas.move(homeScoreText,5.2,0)
+            canvas.move(GreenLeft,7.6,0)
+            canvas.update()
+       
+    isMini = True
+            
+def full():
+    global isMini
+    global font17
+    global font23
+    global font25
+    if isMini:
+        for i in range (0,100,1):
+            time.sleep(.01)
+            canvas.coords(timeBGCanvas, 1099.6-(.40*i), 19.8-(.2*i),1220,40)
+            canvas.move(timeText,-.2, -.1)
+            if i % 12==0:
+                font23 += 1
+                canvas.itemconfig(timeText,font=('Ariel Black',str(font23),'bold'))
+            if i % 14==0:
+                font25 += 1
+                canvas.itemconfig(downText,font=('Ariel',str(font23), 'bold'))
+            if i % 20==0:
+                font17 += 1
+                canvas.itemconfig(periodText,font=('Ariel', str(font17),'bold'))
+            canvas.coords(downBGCanvas, 1058-i*2,0,1220.38-(1.62*i),20.2+(.2*i))
+            canvas.coords(periodBGCanvas,1058.19-i*2.81, 19.8-(.2*i), 1107.5-i*2.5,40)
+            canvas.coords(blankCanvas,1058.19-i*2.81,0,1220,40)
+            canvas.move(downText,-1.8,+.1)
+            canvas.move(periodText,-2.6,-.1)
+            canvas.move(awayCanvas,-5.2,0)
+            canvas.move(awayNameText,-5.83,0)
+            canvas.move(awLogo,-2.8,0)
+            canvas.move(awTO1,-2.8,0)
+            canvas.move(awTO2,-2.8,0)
+            canvas.move(awTO3,-2.8,0)
+            canvas.move(awayScoreBGCanvas,-2.8,0)
+            canvas.move(awayScoreText,-2.8,0)
+            canvas.move(homeCanvas,-7.6,0)
+            canvas.move(homeNameText,-8.23,0)
+            canvas.move(hmLogo,-5.2,0)
+            canvas.move(hmTO1,-5.2,0)
+            canvas.move(hmTO2,-5.2,0)
+            canvas.move(hmTO3,-5.2,0)
+            canvas.move(homeScoreBGCanvas,-5.2,0)
+            canvas.move(homeScoreText,-5.2,0)
+            canvas.move(GreenLeft,-7.6,0)
+            canvas.update()
+
+    isMini = False
+
 notebook = ttk.Notebook(root)
 notebook.pack(expand=True)
 
 canvas = Canvas(score, height=43, width=1280,bg="#00ff00",highlightthickness=0)
-canvas2 = Canvas(root, height=1, width=1000)
 homeCanvas = canvas.create_rectangle(60, 0, 420, 40, outline="#cecece", fill="#cecece")
+homeNameText = canvas.create_text(65, 20, text=home_name, font=('Arial Black', 25),anchor="w")
 hmLogo=canvas.create_image(330,20,image="")
 homeScoreBGCanvas = canvas.create_rectangle(368, 2, 420, 40, outline="#141414", fill="#141414")
 homeScoreText = canvas.create_text(394,20, text=homePt, font=('Arial Black', 23), fill="white")
-homeNameText = canvas.create_text(65, 20, text=home_name, font=('Arial Black', 25),anchor="w")
 awayCanvas = canvas.create_rectangle(420, 0, 780, 40, outline="#cecece", fill="#cecece")
+awayNameText = canvas.create_text(425, 20, text=away_name, font=('Arial Black', 25),anchor="w")
 awLogo=canvas.create_image(690,20,image="")
 awayScoreBGCanvas = canvas.create_rectangle(728, 2, 780, 40, outline="#141414", fill="#141414")
 awayScoreText = canvas.create_text(754,20, text=awayPt, font=('Arial Black', 23), fill="white")
-awayNameText = canvas.create_text(425, 20, text=away_name, font=('Arial Black', 25),anchor="w")
-periodBGCanvas = canvas.create_rectangle(780, 0, 860, 40, outline="#1d1d1d", fill="#1d1d1d")
-periodText = canvas.create_text(820,20, text="1st", font=('Ariel', 17,'bold'), fill="gold")
+blankCanvas = canvas.create_rectangle(780,0,1220,40, fill="#1d1d1d", outline="#1d1d1d")
 downBGCanvas = canvas.create_rectangle(860,0, 1060, 40, outline="#cecece", fill="#cecece")
-downText = canvas.create_text(960,20, text=distanceName, font=('Ariel', 25,'bold'))
+downText = canvas.create_text(960,20, text=distanceName, font=('Ariel', str(font25),'bold'))
 timeBGCanvas = canvas.create_rectangle(1060,0,1220,40, outline="#1d1d1d", fill="#1d1d1d")
-timeText = canvas.create_text(1140,20, text = (minute.get() + ':' + second.get()),font=('Arial Black', 23), fill="white")
-canvas.create_oval(352,4,360,12, fill='white')
-canvas.create_oval(352,16,360,24, fill='white')
-canvas.create_oval(352,28,360,36, fill='white')
-canvas.create_oval(712,4,720,12, fill='white')
-canvas.create_oval(712,16,720,24, fill='white')
-canvas.create_oval(712,28,720,36, fill='white')
+timeText = canvas.create_text(1140,20, text = (minute.get() + ':' + second.get()),font=('Arial Black', str(font23)), fill="white")
+periodBGCanvas = canvas.create_rectangle(780, 0, 860, 40, outline="#1d1d1d", fill="#1d1d1d")
+periodText = canvas.create_text(820,20, text="1st", font=('Ariel', str(font17),'bold'), fill="gold")
+hmTO1=canvas.create_oval(352,4,360,12, fill='white')
+hmTO2=canvas.create_oval(352,16,360,24, fill='white')
+hmTO3=canvas.create_oval(352,28,360,36, fill='white')
+awTO1=canvas.create_oval(712,4,720,12, fill='white')
+awTO2=canvas.create_oval(712,16,720,24, fill='white')
+awTO3=canvas.create_oval(712,28,720,36, fill='white')
 possessionLine = canvas.create_rectangle(60,40,1220,43, outline="black", fill="black")
 homePossession = canvas.create_polygon(0,0,0,0,0,0, outline=homeColor['hex'], fill=homeColor['hex'])
 awayPossession = canvas.create_polygon(0,0,0,0,0,0, outline=awayColor['hex'], fill=awayColor['hex'])
+GreenRight = canvas.create_rectangle(1220,0,1280,43,outline="#00ff00", fill="#00ff00")
+GreenLeft = canvas.create_rectangle(-1000,0,60,43,outline="#00ff00", fill="#00ff00")
+canvas.pack()
 canvas.pack()
 
 controllNotebook = Frame(root, bg="#404040", width=950, height=320)
@@ -386,17 +491,23 @@ away_name.insert(0,"Away")
 away_name.place(x=5, y= 5)
 
 minuteEntry = Entry(bottomFrame, width=3, font=("Arial", 18, ""),textvariable=minute)
-minuteEntry.place(x=405,y=30)
+minuteEntry.place(x=305,y=30)
 
 secondEntry = Entry(bottomFrame, width=3, font=("Arial", 18, ""),textvariable=second)
-secondEntry.place(x=455,y=30)
+secondEntry.place(x=355,y=30)
 
 
 timeLabel = Label(bottomFrame, bg="#696969", fg="white", text="Game Clock",font=('Ariel', 15))
-timeLabel.place(x=395,y=0)
+timeLabel.place(x=325,y=0)
 
 submitTime_btn = Button(bottomFrame, text='Submit', bd='5',command=submitTime)
-submitTime_btn.place(x=505,y=30)
+submitTime_btn.place(x=405,y=30)
+
+start_btn = Button(bottomFrame, text='Start', bd='5',command=start)
+start_btn.place(x=305,y=65)
+
+stop_btn = Button(bottomFrame, text='Stop', bd='5',command=stop)
+stop_btn.place(x=355,y=65)
 
 submitHomeName_btn = Button(homeFrame, text="Submit", bd='5',command=submitHomeName)
 submitHomeName_btn.place(x=130,y=2)
@@ -404,11 +515,6 @@ submitHomeName_btn.place(x=130,y=2)
 submitAwayName_btn = Button(awayFrame, text="Submit", bd='5',command=submitAwayName)
 submitAwayName_btn.place(x=130,y=2)
 
-start_btn = Button(bottomFrame, text='Start', bd='5',command=start)
-start_btn.place(x=405,y=65)
-
-stop_btn = Button(bottomFrame, text='Stop', bd='5',command=stop)
-stop_btn.place(x=455,y=65)
 
 hmColorPicker = Button(homeFrame, text = "Color", command=hmColor)
 hmColorPicker.place(x=200,y=2)
@@ -547,18 +653,22 @@ GlDist_btn.place(x=195,y=80)
 HideDist_btn = Button(downFrame, height=1, width=8,text = "Hide", command = HideDownDist)
 HideDist_btn.place(x=195,y=120)
 
-Quit_btn = Button(bottomFrame, text = "Quit", command=Quit)
-Quit_btn.place(x=870,y=70)
-
-
 PossessionLabel= Label(bottomFrame, bg="#696969", fg="white", text="Possession",font=('Ariel', 15))
-PossessionLabel.place(x=680,y=0)
+PossessionLabel.place(x=580,y=0)
 homePossession_btn=Button(bottomFrame, height=2, width=8,text = "Home", command = lambda: possession(1))
-homePossession_btn.place(x=620,y=30)
+homePossession_btn.place(x=520,y=30)
 noPossession_btn= Button(bottomFrame, height=2, width=8,text = "None", command = lambda: possession(0))
-noPossession_btn.place(x=700,y=30)
+noPossession_btn.place(x=600,y=30)
 awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command = lambda: possession(2))
-awayPossession_btn.place(x=780,y=30)
+awayPossession_btn.place(x=680,y=30)
+
+
+mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=mini)
+mini_btn.place(x=800,y=3)
+
+full_btn = Button(bottomFrame, height=2, width=8, text='Full', bd='5',command=full)
+full_btn.place(x=800,y=52)
+
 
 notebook.add(controllNotebook, text="Control")
 
