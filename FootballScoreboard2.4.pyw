@@ -639,7 +639,7 @@ away_name = Entry(awaySetupFrame, width=12, font=("Arial", 12))
 away_name.insert(0,"Away")
 away_name.place(x=170, y= 47)
 
-submitAwayName_btn = Button(awaySetupFrame, text="Submit", bd='5',command=submitAwayName)
+submitAwayName_btn = Button(awaySetupFrame, text="Submit",command=submitAwayName)
 submitAwayName_btn.place(x=300,y=46)
 
 awColorPicker = Button(awaySetupFrame,width=30, height=30,image = colorIcon, command=awColor)
