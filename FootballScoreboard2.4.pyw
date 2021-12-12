@@ -3,8 +3,9 @@ from tkinter import colorchooser
 from tkinter import ttk
 from tkinter import filedialog
 import time
+import pickle
 
-##Version 2.3
+##Version 2.4
 ##Creator Kevin Zheng
 
 ##Create TK window, set Name
@@ -17,15 +18,16 @@ root.configure(background="#404040")
 score = Tk()
 score.title("Football Scoreboard")
 score.configure(background="#00b140")
+score.geometry('1280x43')
 score.resizable(width=False, height=False)  ##lock window resizeing so window crop will work right in OBS
 
 ##Declare Variable
 homePt = 0
 homeColor = {}
-home_name = "Home" 
+homeName = "Home" 
 awayPt = 0
 awayColor = {}
-away_name = "Away"
+awayName = "Away"
 minute = StringVar()
 second = StringVar()
 doTicks = False
@@ -36,12 +38,8 @@ distance = 10
 distanceName = down, '&' , str(distance)
 homeTO = 3
 awayTO = 3
-hmTOi=4
-hmTOj=12
-awTOi=4
-awTOj=12
-awayColor['hex']="#cecece"
 homeColor['hex']="#cecece"
+awayColor['hex']="#cecece"
 holderTime = 0
 hmImage= PhotoImage(file="")
 awImage= PhotoImage(file="")
@@ -49,6 +47,12 @@ isMini = False
 font17 = 17
 font23 = 23
 font25 = 25
+hmImagePath = ''
+awImagePath = ''
+colorIcon= PhotoImage(file='image/color.png')
+pictureIcon = PhotoImage(file='image/picture.png')
+folderIcon = PhotoImage(file='image/folder.png')
+saveIcon = PhotoImage(file='image/save.png')
 
 # setting the default value as 0
 minute.set("00")
@@ -120,7 +124,9 @@ def hmColor():
 
 ##just uses config to update home name using input from entry
 def submitHomeName():
-    canvas.itemconfig(homeNameText, text=home_name.get())
+    global homeName
+    homeName = home_name.get()
+    canvas.itemconfig(homeNameText, text=homeName)
 
 ##takes in a parameter and adds that to homePt varable and updates it with config
 def addHomePoint(point):
@@ -130,12 +136,16 @@ def addHomePoint(point):
       canvas.itemconfig(homeScoreText, font=('Arial Black', 23))
   elif homePt>99:
       canvas.itemconfig(homeScoreText, font=('Arial Black', 17))
+  if homePt < 0:
+      homePt=0
   canvas.itemconfig(homeScoreText, text=homePt)
   HomePointLabel.configure(text=homePt)
 
 def homeImage():
     global hmImage
+    global hmImagePath
     root.filename = filedialog.askopenfilename(initialdir = "/Pictures",title = "Select a File",filetypes = (("png files", "*.png*"),("all files","*.*")))
+    hmImagePath=(root.filename)
     hmImage= PhotoImage(master=canvas, file=root.filename)
     oldHeight = hmImage.height()
     scale_h = (int)(oldHeight/40)
@@ -176,7 +186,9 @@ def awColor():
 
 ##Same as home
 def submitAwayName():
-    canvas.itemconfig(awayNameText, text=away_name.get())
+    global awayName
+    awayName = away_name.get()
+    canvas.itemconfig(awayNameText, text=awayName)
 
 ##Same as home
 def addAwayPoint(point):
@@ -186,12 +198,16 @@ def addAwayPoint(point):
       canvas.itemconfig(awayScoreText, font=('Arial Black', 23))
   elif awayPt>99:
       canvas.itemconfig(awayScoreText, font=('Arial Black', 17))
+  if awayPt < 0:
+      awayPt=0
   canvas.itemconfig(awayScoreText, text=awayPt)
   AwayScoreLabel.configure(text=awayPt)
 
 def awayImage():
     global awImage
+    global awImagePath
     root.filename = filedialog.askopenfilename(initialdir = "/Pictures",title = "Select a File",filetypes = (("png files", "*.png*"),("all files","*.*")))
+    awImagePath=(root.filename)
     awImage= PhotoImage(master=canvas, file=root.filename)
     oldHeight = awImage.height()
     scale_h = (int)(oldHeight/40)
@@ -348,8 +364,9 @@ def mini():
     global font23
     global font25
     if isMini == False:
+        isMini = True
         for i in range (0,100,1):
-            time.sleep(.01)
+            time.sleep(.0001)
             canvas.coords(timeBGCanvas, 1060+(.40*i), 0+(.2*i),1220,40)
             canvas.move(timeText,.2, .1)
             if i % 12==0:
@@ -384,8 +401,6 @@ def mini():
             canvas.move(homeScoreText,5.2,0)
             canvas.move(GreenLeft,7.6,0)
             canvas.update()
-       
-    isMini = True
             
 def full():
     global isMini
@@ -393,8 +408,9 @@ def full():
     global font23
     global font25
     if isMini:
+        isMini = False
         for i in range (0,100,1):
-            time.sleep(.01)
+            time.sleep(.0001)
             canvas.coords(timeBGCanvas, 1099.6-(.40*i), 19.8-(.2*i),1220,40)
             canvas.move(timeText,-.2, -.1)
             if i % 12==0:
@@ -430,21 +446,79 @@ def full():
             canvas.move(GreenLeft,-7.6,0)
             canvas.update()
 
-    isMini = False
+def save():
+    global homeColor
+    global homeName
+    global hmImagePath
+    global awayColor
+    global awayName
+    global awImagePath
+    global templateName
+    x=[homeColor,homeName,hmImagePath,awayColor,awayName,awImagePath]
+    savePath = 'saved_games/' + str(templateName.get()) + '.txt'
+    with open (savePath, 'wb') as f:
+        pickle.dump(x, f)
+
+def load():
+    global homeColor
+    global homeName
+    global hmImagePath
+    global awayColor
+    global awayName
+    global awImagePath
+    global hmImage
+    global awImage
+    root.filename = filedialog.askopenfilename(initialdir = "saved_games",title = "Select a File",filetypes = (("txt files", "*.txt*"),("all files","*.*")))
+    with open (root.filename, 'rb') as f:
+        x=pickle.load(f)
+    homeColor=x[0]
+    homeName=x[1]
+    hmImagePath=x[2]
+    awayColor=x[3]
+    awayName=x[4]
+    awImagePath=x[5]
+    canvas.itemconfig(homeCanvas, outline=homeColor['hex'], fill=homeColor['hex'])
+    canvas.itemconfig(homePossession, outline=homeColor['hex'], fill=homeColor['hex'])
+    canvas.itemconfig(homeNameText, text=homeName)
+    home_name.delete(0, END)
+    home_name.insert(0,homeName)
+    hmImage= PhotoImage(master=canvas, file=hmImagePath)
+    oldHeight = hmImage.height()
+    scale_h = (int)(oldHeight/40)
+    hmImage= hmImage.subsample(scale_h)
+    canvas.itemconfig(hmLogo, image=hmImage)
+    canvas.itemconfig(awayCanvas, outline=awayColor['hex'], fill=awayColor['hex'])
+    canvas.itemconfig(awayPossession, outline=awayColor['hex'], fill=awayColor['hex'])
+    canvas.itemconfig(awayNameText, text=awayName)
+    away_name.delete(0, END)
+    away_name.insert(0,awayName)
+    awImage= PhotoImage(master=canvas, file=awImagePath)
+    oldHeight = awImage.height()
+    scale_h = (int)(oldHeight/40)
+    awImage= awImage.subsample(scale_h)
+    canvas.itemconfig(awLogo, image=awImage)
+
+def Close():
+    score.destroy()
+    root.destroy()
+
+##Copied somewhere from Internet Not sure how it works but it works
+def scrollwheel(event):
+    setupCanvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
 notebook = ttk.Notebook(root)
 notebook.pack(expand=True)
 
 canvas = Canvas(score, height=43, width=1280,bg="#00ff00",highlightthickness=0)
 homeCanvas = canvas.create_rectangle(60, 0, 420, 40, outline="#cecece", fill="#cecece")
-homeNameText = canvas.create_text(65, 20, text=home_name, font=('Arial Black', 25),anchor="w")
+homeNameText = canvas.create_text(65, 20, text=homeName, font=('Arial Black', 25),anchor="w")
 hmLogo=canvas.create_image(330,20,image="")
-homeScoreBGCanvas = canvas.create_rectangle(368, 2, 420, 40, outline="#141414", fill="#141414")
+homeScoreBGCanvas = canvas.create_rectangle(368, 0, 420, 40, outline="#141414", fill="#141414")
 homeScoreText = canvas.create_text(394,20, text=homePt, font=('Arial Black', 23), fill="white")
 awayCanvas = canvas.create_rectangle(420, 0, 780, 40, outline="#cecece", fill="#cecece")
-awayNameText = canvas.create_text(425, 20, text=away_name, font=('Arial Black', 25),anchor="w")
+awayNameText = canvas.create_text(425, 20, text=awayName, font=('Arial Black', 25),anchor="w")
 awLogo=canvas.create_image(690,20,image="")
-awayScoreBGCanvas = canvas.create_rectangle(728, 2, 780, 40, outline="#141414", fill="#141414")
+awayScoreBGCanvas = canvas.create_rectangle(728, 0, 780, 40, outline="#141414", fill="#141414")
 awayScoreText = canvas.create_text(754,20, text=awayPt, font=('Arial Black', 23), fill="white")
 blankCanvas = canvas.create_rectangle(780,0,1220,40, fill="#1d1d1d", outline="#1d1d1d")
 downBGCanvas = canvas.create_rectangle(860,0, 1060, 40, outline="#cecece", fill="#cecece")
@@ -465,11 +539,27 @@ awayPossession = canvas.create_polygon(0,0,0,0,0,0, outline=awayColor['hex'], fi
 GreenRight = canvas.create_rectangle(1220,0,1280,43,outline="#00ff00", fill="#00ff00")
 GreenLeft = canvas.create_rectangle(-1000,0,60,43,outline="#00ff00", fill="#00ff00")
 canvas.pack()
-canvas.pack()
 
+##set up frames to be added to notebook
 controllNotebook = Frame(root, bg="#404040", width=950, height=320)
 controllNotebook.pack(fill='both', expand=True)
 
+setupNotebook = Frame(root,bg="#404040", width=950, height=320)
+setupNotebook.pack(fill='both', expand=True)
+
+setupCanvas = Canvas(setupNotebook, bg="#404040")
+setupCanvas.pack(side='left',fill='both', expand=True)
+
+scroll = Scrollbar(setupNotebook, orient=VERTICAL, command= setupCanvas.yview)
+scroll.pack(side=RIGHT,fill=Y)
+
+setupCanvas.configure(yscrollcommand=scroll.set)
+setupCanvas.bind('<Configure>', lambda e: setupCanvas.configure(scrollregion=setupCanvas.bbox("all")))
+
+setupFrame = Frame(setupCanvas, bg="#404040")
+setupCanvas.create_window((0,0), window=setupFrame, anchor= NW)
+
+##set up frames
 homeFrame= Frame(controllNotebook, bg="#949494", width=300, height=160, borderwidth=0,highlightthickness=0)
 homeFrame.place(x=20,y=20)
 
@@ -482,53 +572,37 @@ downFrame.place(x=340,y=20)
 bottomFrame= Frame(controllNotebook, bg="#696969", width=910, height=100, borderwidth=0,highlightthickness=0)
 bottomFrame.place(x=20,y=200)
 
-home_name = Entry(homeFrame, width=12, font=("Arial", 12))
+homeSetupFrame= Frame(setupFrame, bg="#949494", width=890, height=180)
+homeSetupFrame.grid(row=0,column=0,padx=20,pady=20)
+
+awaySetupFrame= Frame(setupFrame, bg="#949494", width=890, height=180)
+awaySetupFrame.grid(row=1,column=0,padx=20,pady=20)
+
+templateSetupFrame= Frame(setupFrame, bg="#949494", width=890, height=180)
+templateSetupFrame.grid(row=2,column=0,padx=20,pady=20)
+
+##Home Setup Frame Items
+home_name = Entry(homeSetupFrame, width=12, font=("Arial", 12))
 home_name.insert(0,"Home")
-home_name.place(x=5, y= 5)
+home_name.place(x=170, y= 47)
 
-away_name = Entry(awayFrame, width=12, font=("Arial", 12))
-away_name.insert(0,"Away")
-away_name.place(x=5, y= 5)
+submitHomeName_btn = Button(homeSetupFrame, text="Submit",command=submitHomeName)
+submitHomeName_btn.place(x=300,y=46)
 
-minuteEntry = Entry(bottomFrame, width=3, font=("Arial", 18, ""),textvariable=minute)
-minuteEntry.place(x=305,y=30)
+hmColorPicker = Button(homeSetupFrame,width=30, height=30,image = colorIcon, command=hmColor)
+hmColorPicker.place(x=170,y=86)
 
-secondEntry = Entry(bottomFrame, width=3, font=("Arial", 18, ""),textvariable=second)
-secondEntry.place(x=355,y=30)
+hmLogoPicker = Button(homeSetupFrame,width=30, height=30,image = pictureIcon, command = homeImage)
+hmLogoPicker.place(x=170,y=133)
 
+Label(homeSetupFrame, bg="#949494", fg='black', text="Home Team Setup",font=('Ariel', 17)).place(x=5,y=2)
+Label(homeSetupFrame, bg="#949494", fg='black', text="Enter Home Name:",font=('Ariel', 12)).place(x=30,y=45)
+Label(homeSetupFrame, bg="#949494", fg='black', text="Home Team Color:",font=('Ariel', 12)).place(x=30,y=90)
+Label(homeSetupFrame, bg="#949494", fg='black', text="Home Team Logo:",font=('Ariel', 12)).place(x=32,y=135)
 
-timeLabel = Label(bottomFrame, bg="#696969", fg="white", text="Game Clock",font=('Ariel', 15))
-timeLabel.place(x=325,y=0)
-
-submitTime_btn = Button(bottomFrame, text='Submit', bd='5',command=submitTime)
-submitTime_btn.place(x=405,y=30)
-
-start_btn = Button(bottomFrame, text='Start', bd='5',command=start)
-start_btn.place(x=305,y=65)
-
-stop_btn = Button(bottomFrame, text='Stop', bd='5',command=stop)
-stop_btn.place(x=355,y=65)
-
-submitHomeName_btn = Button(homeFrame, text="Submit", bd='5',command=submitHomeName)
-submitHomeName_btn.place(x=130,y=2)
-
-submitAwayName_btn = Button(awayFrame, text="Submit", bd='5',command=submitAwayName)
-submitAwayName_btn.place(x=130,y=2)
-
-
-hmColorPicker = Button(homeFrame, text = "Color", command=hmColor)
-hmColorPicker.place(x=200,y=2)
-
-hmLogoPicker = Button(homeFrame, text = "Logo", command = homeImage)
-hmLogoPicker.place(x=250,y=2)
-
-awColorPicker = Button(awayFrame, text = "Color", command=awColor)
-awColorPicker.place(x=200,y=2)
-
-awLogoPicker = Button(awayFrame, text = "Logo", command = awayImage)
-awLogoPicker.place(x=250,y=2)
-
+##Home Frame Items
 ##Home Point Button
+Label(homeFrame, bg="#949494", fg="black", text="HOME",font=('Ariel Black', 23,'bold')).place(x=100,y=-3)
 homeScoreLabel = Label(homeFrame, bg="#949494", fg="white", text="Score",font=('Ariel', 12))
 homeScoreLabel.place(x=60,y=30)
 homeTdButton = Button(homeFrame,width='2', text = "+6", command=lambda: addHomePoint(6))
@@ -550,6 +624,7 @@ homeMinus1Button.place(x=20,y=120)
 HomePointLabel= Label(homeFrame, height=0, width=11, bg="black", fg="#e08d3e", text=homePt, font=('Ariel', 15))
 HomePointLabel.place(x=20,y=87)
 
+##Home Time Out Buttons
 homeTOLLabel = Label(homeFrame, bg="#949494", fg="white", text="T.O.L.",font=('Ariel', 12))
 homeTOLLabel.place(x=200,y=30)
 HomeTOLabel=Label(homeFrame, height=0, width=3, bg="black", fg="#e08d3e", text=homeTO, font=('Ariel', 15))
@@ -559,7 +634,28 @@ homeTOMinus_btn.place(x=209,y=120)
 homeTOAdd_btn = Button(homeFrame, text = "+",width='2', command=addhomeTO)
 homeTOAdd_btn.place(x=209,y=57)
 
+##Away Setup Frame Items
+away_name = Entry(awaySetupFrame, width=12, font=("Arial", 12))
+away_name.insert(0,"Away")
+away_name.place(x=170, y= 47)
+
+submitAwayName_btn = Button(awaySetupFrame, text="Submit", bd='5',command=submitAwayName)
+submitAwayName_btn.place(x=300,y=46)
+
+awColorPicker = Button(awaySetupFrame,width=30, height=30,image = colorIcon, command=awColor)
+awColorPicker.place(x=170,y=86)
+
+awLogoPicker = Button(awaySetupFrame,width=30, height=30,image = pictureIcon, command = awayImage)
+awLogoPicker.place(x=170,y=133)
+
+Label(awaySetupFrame, bg="#949494", fg='black', text="Away Team Setup",font=('Ariel', 17)).place(x=5,y=2)
+Label(awaySetupFrame, bg="#949494", fg='black', text="Enter Away Name:",font=('Ariel', 12)).place(x=30,y=45)
+Label(awaySetupFrame, bg="#949494", fg='black', text="Away Team Color:",font=('Ariel', 12)).place(x=30,y=90)
+Label(awaySetupFrame, bg="#949494", fg='black', text="Away Team Logo:",font=('Ariel', 12)).place(x=32,y=135)
+
+##Away Frame Items
 ##Away Point Button
+Label(awayFrame, bg="#949494", fg="black", text="AWAY",font=('Ariel Black', 23,'bold')).place(x=100,y=-3)
 awayScoreLabel = Label(awayFrame, bg="#949494", fg="white", text="Score",font=('Ariel', 12))
 awayScoreLabel.place(x=60,y=30)
 awayTdButton = Button(awayFrame,width='2', text = "+6", command=lambda: addAwayPoint(6))
@@ -581,6 +677,7 @@ awayMinus1Button.place(x=20,y=120)
 AwayScoreLabel= Label(awayFrame, height=0, width=11, bg="black", fg="#e08d3e", text=awayPt, font=('Ariel', 15))
 AwayScoreLabel.place(x=20,y=87)
 
+##Away Time Out Buttons
 awayTOLLabel = Label(awayFrame, bg="#949494", fg="white", text="T.O.L.",font=('Ariel', 12))
 awayTOLLabel.place(x=200,y=30)
 AwayTOLabel=Label(awayFrame, height=0, width=3, bg="black", fg="#e08d3e", text=homeTO, font=('Ariel', 15))
@@ -590,7 +687,22 @@ awayTOMinus_btn.place(x=209,y=120)
 awayTOAdd_btn = Button(awayFrame, width='2', text = "+", command=addawayTO)
 awayTOAdd_btn.place(x=209,y=57)
 
-##Period button
+##Bottom Frame Items
+##Time Items
+minuteEntry = Entry(bottomFrame, width=3, font=("Arial", 18, ""),textvariable=minute)
+minuteEntry.place(x=305,y=30)
+secondEntry = Entry(bottomFrame, width=3, font=("Arial", 18, ""),textvariable=second)
+secondEntry.place(x=355,y=30)
+submitTime_btn = Button(bottomFrame, text='Submit', bd='5',command=submitTime)
+submitTime_btn.place(x=405,y=30)
+start_btn = Button(bottomFrame, text='Start', bd='5',command=start)
+start_btn.place(x=305,y=65)
+stop_btn = Button(bottomFrame, text='Stop', bd='5',command=stop)
+stop_btn.place(x=355,y=65)
+timeLabel = Label(bottomFrame, bg="#696969", fg="white", text="Game Clock",font=('Ariel', 15))
+timeLabel.place(x=325,y=0)
+
+##Period Items
 periodLabel= Label(bottomFrame, bg="#696969", fg="white", text="Period",font=('Ariel', 15))
 periodLabel.place(x=120,y=0)
 Period1Button = Button(bottomFrame,width=3, text = "1st", command=lambda: period(1))
@@ -618,7 +730,25 @@ Period5OtButton.place(x=180,y=65)
 PeriodHideButton = Button(bottomFrame,width=4, text = "Hide", command=lambda: period(0))
 PeriodHideButton.place(x=220,y=65)
 
-##Down Button
+##Possesion Items
+PossessionLabel= Label(bottomFrame, bg="#696969", fg="white", text="Possession",font=('Ariel', 15))
+PossessionLabel.place(x=580,y=0)
+homePossession_btn=Button(bottomFrame, height=2, width=8,text = "Home", command = lambda: possession(1))
+homePossession_btn.place(x=520,y=30)
+noPossession_btn= Button(bottomFrame, height=2, width=8,text = "None", command = lambda: possession(0))
+noPossession_btn.place(x=600,y=30)
+awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command = lambda: possession(2))
+awayPossession_btn.place(x=680,y=30)
+
+##Board View Items
+mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=mini)
+mini_btn.place(x=800,y=3)
+
+full_btn = Button(bottomFrame, height=2, width=8, text='Full', bd='5',command=full)
+full_btn.place(x=800,y=52)
+
+##Down Frame Items
+##Down Items
 Down1Button = Button(downFrame, text = "1st Down", width=8, command=lambda: down(1))
 Down1Button.place(x=10,y=20)
 Down2Button = Button(downFrame, text = "2nd Down", width=8, command=lambda: down(2))
@@ -653,24 +783,27 @@ GlDist_btn.place(x=195,y=80)
 HideDist_btn = Button(downFrame, height=1, width=8,text = "Hide", command = HideDownDist)
 HideDist_btn.place(x=195,y=120)
 
-PossessionLabel= Label(bottomFrame, bg="#696969", fg="white", text="Possession",font=('Ariel', 15))
-PossessionLabel.place(x=580,y=0)
-homePossession_btn=Button(bottomFrame, height=2, width=8,text = "Home", command = lambda: possession(1))
-homePossession_btn.place(x=520,y=30)
-noPossession_btn= Button(bottomFrame, height=2, width=8,text = "None", command = lambda: possession(0))
-noPossession_btn.place(x=600,y=30)
-awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command = lambda: possession(2))
-awayPossession_btn.place(x=680,y=30)
+##Template Setup Frame Items
+Label(templateSetupFrame, bg="#949494", fg='black', text="Template",font=('Ariel', 17)).place(x=5,y=2)
+Label(templateSetupFrame, bg="#949494", fg='black', text="Enter Template Name:",font=('Ariel', 12)).place(x=30,y=45)
+Label(templateSetupFrame, bg="#949494", fg='black', text="Load Template:",font=('Ariel', 12)).place(x=77,y=90)
+templateName = Entry(templateSetupFrame, width=12, font=("Arial", 12))
+templateName.place(x=190,y=47)
+save_btn=Button(templateSetupFrame,width=30, height=30,image = saveIcon,command=save)
+save_btn.place(x=310,y=42)
+load_btn=Button(templateSetupFrame,width=30, height=30,image = folderIcon, command = load)
+load_btn.place(x=195,y=87)
 
-
-mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=mini)
-mini_btn.place(x=800,y=3)
-
-full_btn = Button(bottomFrame, height=2, width=8, text='Full', bd='5',command=full)
-full_btn.place(x=800,y=52)
-
-
+##Takes the frames and add them to the notebook
 notebook.add(controllNotebook, text="Control")
+notebook.add(setupNotebook, text='Setup')
+
+##When the root window close button id click it execute the rootCLose Function
+score.protocol("WM_DELETE_WINDOW", Close)
+root.protocol("WM_DELETE_WINDOW", Close)
+
+##Binds Mouse Wheel to scrollwheel Command
+root.bind("<MouseWheel>", scrollwheel)
 
 root.mainloop()
 score.mainloop()
