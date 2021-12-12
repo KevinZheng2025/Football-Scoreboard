@@ -1,9 +1,9 @@
 # Football-Scoreboard
-Scoreboard that is built on python3.9 and has a live display so you can bring it into your live streaming software like OBS.
+Scoreboard that is built on python and has a live display so you can bring it into your live streaming software like OBS.
 
 Set up program for live streaming in OBS
 
-Step 1: Download the FootballScoreboard.pyw file
+Step 1: Download the main repository as a ZIP file and extranct it.
 
 Step 2: If you're on Windows install python either from https://www.python.org/downloads/ or the Microsoft Store. Macs will have Python installed already
 
