@@ -1,6 +1,8 @@
 # Football-Scoreboard
 Scoreboard that is built on python and has a live display so you can bring it into your live streaming software like OBS.
 
+If you are broadcasting for highschool teams you can visit https://github.com/KevinZheng2025/HighSchoolLogo.git for a list of several highschool team logos ready to use on the Scoreboard.
+
 Set up program for live streaming in OBS
 
 Step 1: Download the main repository as a ZIP file and extranct it.
