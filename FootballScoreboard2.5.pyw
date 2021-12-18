@@ -2,10 +2,11 @@ from tkinter import *
 from tkinter import colorchooser
 from tkinter import ttk
 from tkinter import filedialog
+from threading import *
 import time
 import pickle
 
-##Version 2.4
+##Version 2.5
 ##Creator Kevin Zheng
 
 ##Create TK window, set Name
@@ -138,8 +139,11 @@ def addHomePoint(point):
       canvas.itemconfig(homeScoreText, font=('Arial Black', 17))
   if homePt < 0:
       homePt=0
-  canvas.itemconfig(homeScoreText, text=homePt)
   HomePointLabel.configure(text=homePt)
+  if point < 6:
+    canvas.itemconfig(homeScoreText, text=homePt)
+  else:
+    TDAnimation('home')
 
 def homeImage():
     global hmImage
@@ -192,16 +196,19 @@ def submitAwayName():
 
 ##Same as home
 def addAwayPoint(point):
-  global awayPt
-  awayPt = awayPt + point
-  if awayPt<100:
-      canvas.itemconfig(awayScoreText, font=('Arial Black', 23))
-  elif awayPt>99:
-      canvas.itemconfig(awayScoreText, font=('Arial Black', 17))
-  if awayPt < 0:
-      awayPt=0
-  canvas.itemconfig(awayScoreText, text=awayPt)
-  AwayScoreLabel.configure(text=awayPt)
+    global awayPt
+    awayPt = awayPt + point
+    if awayPt<100:
+        canvas.itemconfig(awayScoreText, font=('Arial Black', 23))
+    elif awayPt>99:
+        canvas.itemconfig(awayScoreText, font=('Arial Black', 17))
+    if awayPt < 0:
+        awayPt=0
+    AwayPointLabel.configure(text=awayPt)
+    if point < 6:
+        canvas.itemconfig(awayScoreText, text=awayPt)
+    else:
+        TDAnimation('away')
 
 def awayImage():
     global awImage
@@ -322,6 +329,8 @@ def subtDownDist():
 
 ##just updates the downText canvas so it says 1st & 10
 def resetDownDist():
+    distance_num.delete(0, END)
+    distance_num.insert(0, 10)
     canvas.itemconfig(downText, text = "1st & 10")
 
 ##updates the Canvas text with 1st & 10 and inserts 'GL' into the distance_num entry
@@ -384,6 +393,7 @@ def mini():
             canvas.move(periodText,2.6,.1)
             canvas.coords(blankCanvas,780+i*2.81,0,1220,40)
             canvas.move(awayCanvas,5.2,0)
+            canvas.move(awayGrad,5.2,0)
             canvas.move(awayNameText,5.83,0)
             canvas.move(awLogo,2.8,0)
             canvas.move(awTO1,2.8,0)
@@ -392,6 +402,7 @@ def mini():
             canvas.move(awayScoreBGCanvas,2.8,0)
             canvas.move(awayScoreText,2.8,0)
             canvas.move(homeCanvas,7.6,0)
+            canvas.move(homeGrad,7.6,0)
             canvas.move(homeNameText,8.23,0)
             canvas.move(hmLogo,5.2,0)
             canvas.move(hmTO1,5.2,0)
@@ -428,6 +439,7 @@ def full():
             canvas.move(downText,-1.8,+.1)
             canvas.move(periodText,-2.6,-.1)
             canvas.move(awayCanvas,-5.2,0)
+            canvas.move(awayGrad,-5.2,0)
             canvas.move(awayNameText,-5.83,0)
             canvas.move(awLogo,-2.8,0)
             canvas.move(awTO1,-2.8,0)
@@ -436,6 +448,7 @@ def full():
             canvas.move(awayScoreBGCanvas,-2.8,0)
             canvas.move(awayScoreText,-2.8,0)
             canvas.move(homeCanvas,-7.6,0)
+            canvas.move(homeGrad,-7.6,0)
             canvas.move(homeNameText,-8.23,0)
             canvas.move(hmLogo,-5.2,0)
             canvas.move(hmTO1,-5.2,0)
@@ -498,6 +511,92 @@ def load():
     awImage= awImage.subsample(scale_h)
     canvas.itemconfig(awLogo, image=awImage)
 
+def TDAnimation(team):
+    global homePt
+    global awayPt
+    if team == 'home':
+        canvas.itemconfig(TDUpperL,outline=homeColor['hex'], fill=homeColor['hex'])
+        canvas.itemconfig(TDUpperR,outline=homeColor['hex'], fill=homeColor['hex'])
+        canvas.itemconfig(TDCanvasL,outline=homeColor['hex'], fill=homeColor['hex'])
+        canvas.itemconfig(TDCanvasR,outline=homeColor['hex'], fill=homeColor['hex'])
+    else:
+        canvas.itemconfig(TDUpperL,outline=awayColor['hex'], fill=awayColor['hex'])
+        canvas.itemconfig(TDUpperR,outline=awayColor['hex'], fill=awayColor['hex'])
+        canvas.itemconfig(TDCanvasL,outline=awayColor['hex'], fill=awayColor['hex'])
+        canvas.itemconfig(TDCanvasR,outline=awayColor['hex'], fill=awayColor['hex'])
+    
+    for i in range (130): 
+        if i < 20:
+            canvas.coords(TDUpperL, 640-i*12,0,640,43)
+            canvas.coords(TDUpperR, 640,0,640+i*12,43)
+            canvas.update()
+            time.sleep(.01)
+        if i == 20:
+            canvas.coords(TDBGL,850,0)
+            canvas.coords(TDBGR,430,0)
+            canvas.coords(T,640,20)
+            canvas.coords(O,640,20)
+            canvas.coords(U,640,20)
+            canvas.coords(C,640,20)
+            canvas.coords(H,640,20)
+            canvas.coords(D,640,20)
+            canvas.coords(O2,640,20)
+            canvas.coords(W,640,20)
+            canvas.coords(N,640,20)
+        if i == 35:
+            canvas.coords(TDCanvasL, 200,0,700,43)
+            canvas.coords(TDCanvasR, 580,0,1080,43)
+        if i>20 and i<50:
+            canvas.move(TDBGL,-7,0)
+            canvas.move(TDBGR,7,0)
+            canvas.move(TDCanvasL,-10,0)
+            canvas.move(TDCanvasR,10,0)
+            canvas.move(TDUpperL,-20,0)
+            canvas.move(TDUpperR,20,0)
+            canvas.move(T,-6,0)
+            canvas.move(O,-4.66,0)
+            canvas.move(U,-3.33,0)
+            canvas.move(C,-2,0)
+            canvas.move(H,-.66,0)
+            canvas.move(D,1,0)
+            canvas.move(O2,2.33,0)
+            canvas.move(W,3.83,0)
+            canvas.move(N,5.33,0)
+            canvas.update()
+            time.sleep(.01)
+        if i == 50:
+            canvas.itemconfig(homeScoreText, text=homePt)
+            canvas.itemconfig(awayScoreText, text=awayPt)
+        if i>50 and i<100:
+            canvas.move(T,-2.5,0)
+            canvas.move(O,-2,0)
+            canvas.move(U,-1.5,0)
+            canvas.move(C,-1,0)
+            canvas.move(H,-.5,0)
+            canvas.move(D,.5,0)
+            canvas.move(O2,1,0)
+            canvas.move(W,1.5,0)
+            canvas.move(N,2,0)
+            canvas.update()
+            time.sleep(.01)
+        if i>100:
+            canvas.move(TDBGL,-21,0)
+            canvas.move(TDBGR,21,0)
+            canvas.move(TDCanvasL,-21,0)
+            canvas.move(TDCanvasR,21,0)
+            canvas.move(T,-21,0)
+            canvas.move(O,-21,0)
+            canvas.move(U,-21,0)
+            canvas.move(C,-21,0)
+            canvas.move(H,-21,0)
+            canvas.move(D,21,0)
+            canvas.move(O2,21,0)
+            canvas.move(W,21,0)
+            canvas.move(N,21,0)
+            canvas.update()
+            time.sleep(.01)
+            
+
 def Close():
     score.destroy()
     root.destroy()
@@ -510,13 +609,27 @@ notebook = ttk.Notebook(root)
 notebook.pack(expand=True)
 
 canvas = Canvas(score, height=43, width=1280,bg="#00ff00",highlightthickness=0)
+canvasBG = PhotoImage(master=canvas, file='image/CanvasBG.png')
+imageTDBGL= PhotoImage(master=canvas, file='image/TDBGL.png')
+imageTDBGR= PhotoImage(master=canvas, file='image/TDBGR.png')
+iT= PhotoImage(master=canvas, file='image/T.png')
+iO= PhotoImage(master=canvas, file='image/O.png')
+iU= PhotoImage(master=canvas, file='image/U.png')
+iC= PhotoImage(master=canvas, file='image/C.png')
+iH= PhotoImage(master=canvas, file='image/H.png')
+iD= PhotoImage(master=canvas, file='image/D.png')
+iW= PhotoImage(master=canvas, file='image/W.png')
+iN= PhotoImage(master=canvas, file='image/N.png')
+##Logo = PhotoImage(master=canvas, file='image/save.png')
 homeCanvas = canvas.create_rectangle(60, 0, 420, 40, outline="#cecece", fill="#cecece")
-homeNameText = canvas.create_text(65, 20, text=homeName, font=('Arial Black', 25),anchor="w")
+homeGrad = canvas.create_image(60,0,image=canvasBG,anchor='nw')
+homeNameText = canvas.create_text(65, 20, text=homeName, font=('Arial Black', 25),fill='white',anchor="w")
 hmLogo=canvas.create_image(330,20,image="")
 homeScoreBGCanvas = canvas.create_rectangle(368, 0, 420, 40, outline="#141414", fill="#141414")
 homeScoreText = canvas.create_text(394,20, text=homePt, font=('Arial Black', 23), fill="white")
 awayCanvas = canvas.create_rectangle(420, 0, 780, 40, outline="#cecece", fill="#cecece")
-awayNameText = canvas.create_text(425, 20, text=awayName, font=('Arial Black', 25),anchor="w")
+awayGrad = canvas.create_image(420,0,image=canvasBG,anchor='nw')
+awayNameText = canvas.create_text(425, 20, text=awayName, font=('Arial Black', 25),fill='white',anchor="w")
 awLogo=canvas.create_image(690,20,image="")
 awayScoreBGCanvas = canvas.create_rectangle(728, 0, 780, 40, outline="#141414", fill="#141414")
 awayScoreText = canvas.create_text(754,20, text=awayPt, font=('Arial Black', 23), fill="white")
@@ -536,6 +649,21 @@ awTO3=canvas.create_oval(712,28,720,36, fill='white')
 possessionLine = canvas.create_rectangle(60,40,1220,43, outline="black", fill="black")
 homePossession = canvas.create_polygon(0,0,0,0,0,0, outline=homeColor['hex'], fill=homeColor['hex'])
 awayPossession = canvas.create_polygon(0,0,0,0,0,0, outline=awayColor['hex'], fill=awayColor['hex'])
+TDCanvasL = canvas.create_rectangle(0,0,0,43,outline="", fill="")
+TDCanvasR = canvas.create_rectangle(0,0,0,43,outline="", fill="")
+TDBGL = canvas.create_image(850,70,image=imageTDBGL,anchor='ne')
+TDBGR = canvas.create_image(430,70,image=imageTDBGR,anchor='nw')
+TDUpperL = canvas.create_rectangle(0,0,0,43,outline="", fill="")
+TDUpperR= canvas.create_rectangle(0,0,0,43,outline="", fill="")
+T = canvas.create_image(0,20, image=iT)
+O = canvas.create_image(0,20, image=iO)
+U = canvas.create_image(0,20, image=iU)
+C = canvas.create_image(0,20, image=iC)
+H = canvas.create_image(0,20, image=iH)
+D = canvas.create_image(0,20, image=iD)
+O2 = canvas.create_image(0,20, image=iO)
+W = canvas.create_image(0,20, image=iW)
+N = canvas.create_image(0,20, image=iN)
 GreenRight = canvas.create_rectangle(1220,0,1280,43,outline="#00ff00", fill="#00ff00")
 GreenLeft = canvas.create_rectangle(-1000,0,60,43,outline="#00ff00", fill="#00ff00")
 canvas.pack()
@@ -674,8 +802,8 @@ away1Button = Button(awayFrame,width='2', text = "+1", command=lambda: addAwayPo
 away1Button.place(x=20,y=57)
 awayMinus1Button = Button(awayFrame,width='2', text = "-1", command=lambda: addAwayPoint(-1))
 awayMinus1Button.place(x=20,y=120)
-AwayScoreLabel= Label(awayFrame, height=0, width=11, bg="black", fg="#e08d3e", text=awayPt, font=('Ariel', 15))
-AwayScoreLabel.place(x=20,y=87)
+AwayPointLabel= Label(awayFrame, height=0, width=11, bg="black", fg="#e08d3e", text=awayPt, font=('Ariel', 15))
+AwayPointLabel.place(x=20,y=87)
 
 ##Away Time Out Buttons
 awayTOLLabel = Label(awayFrame, bg="#949494", fg="white", text="T.O.L.",font=('Ariel', 12))
@@ -741,7 +869,7 @@ awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command 
 awayPossession_btn.place(x=680,y=30)
 
 ##Board View Items
-mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=mini)
+mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=TDAnimation)
 mini_btn.place(x=800,y=3)
 
 full_btn = Button(bottomFrame, height=2, width=8, text='Full', bd='5',command=full)
