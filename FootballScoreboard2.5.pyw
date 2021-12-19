@@ -869,7 +869,7 @@ awayPossession_btn=Button(bottomFrame, height=2, width=8,text = "Away", command 
 awayPossession_btn.place(x=680,y=30)
 
 ##Board View Items
-mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=TDAnimation)
+mini_btn = Button(bottomFrame, height=2, width=8, text='Mini', bd='5',command=mini)
 mini_btn.place(x=800,y=3)
 
 full_btn = Button(bottomFrame, height=2, width=8, text='Full', bd='5',command=full)
